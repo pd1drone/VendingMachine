@@ -183,7 +183,7 @@ void loop() {
   Serial.println(PushBtnItem3);
   Serial.println(PushBtnItem4);
   Serial.println(PushBtnItem5);
-  if(IRsensorVal == 0){
+  if(IRsensorVal == 1){
     tone(buzzer,1000);
     String Message="Someone has forced open the vending machine";
     SendMessage(Message);
