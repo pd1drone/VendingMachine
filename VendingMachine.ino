@@ -23,7 +23,7 @@
 
 //BUZZER 
 // DIGITAL PIN 3 =
-const int buzzer = 3; 
+const int buzzer = 10; 
 // SERVO MOTOR
 // DIGITAL PIN 4 = 
 // DIGITAL PIN 5 =
@@ -44,6 +44,10 @@ const int ServoItem3 = 6;
 const int ServoItem4 = 7;
 const int ServoItem5 = 8;
 
+bool InventoryQuantity0 = false;
+bool InventoryQuantity1 = false;
+bool InventoryQuantity2 = false;
+bool InventoryQuantity3 = false;
 // PUSH BUTTON
 // DIGITAL PIN 27 =
 // DIGITAL PIN 28 =
@@ -70,11 +74,11 @@ int PotentioValue;
 int ItemCount;
 
 int NumberOfItemChoosen;
-int ItemCost1=10;
-int ItemCost2=20;
-int ItemCost3=15;
-int ItemCost4=5;
-int ItemCost5=5;
+int ItemCost1=40;
+int ItemCost2=40;
+int ItemCost3=40;
+int ItemCost4=40;
+int ItemCost5=40;
 int TotalItemCost=0;
 int InsertedAmount=0;
 int RemainingCost=0;
@@ -84,21 +88,11 @@ int inventoryItem2=5;
 int inventoryItem3=5;
 int inventoryItem4=5;
 int inventoryItem5=5;
-bool invItemHasbeenChecked1=false;
-bool invItemHasbeenChecked2=false;
-bool invItemHasbeenChecked3=false;
-bool invItemHasbeenChecked4=false;
-bool invItemHasbeenChecked5=false;
-bool isZeroItem1 =false;
-bool isZeroItem2 =false;
-bool isZeroItem3 =false;
-bool isZeroItem4 =false;
-bool isZeroItem5 =false;
 
 bool transactionFinished=false;
 
 String SmsString ="";
-String number = "+639265556648"; //-> change with your number
+String number = "+639996781270"; //-> change with your number
 
 // variable use to measuer the intervals inbetween impulses
 int i=0;
@@ -122,12 +116,12 @@ void setup() {
 
 
  pinMode(buzzer, OUTPUT); // Set buzzer - pin 3 as an output
- pinMode(PushBtnItem1, INPUT_PULLUP); // set btn as input_pullup - pin 27
- pinMode(PushBtnItem2, INPUT_PULLUP); // set btn as input_pullup - pin 28
- pinMode(PushBtnItem3, INPUT_PULLUP); // set btn as input_pullup - pin 29
- pinMode(PushBtnItem4, INPUT_PULLUP); // set btn as input_pullup - pin 30
- pinMode(PushBtnItem5, INPUT_PULLUP); // set btn as input_pullup - pin 31
- pinMode(IRsensor, INPUT); // set ir sensor as input - pin 32
+ pinMode(27, INPUT_PULLUP); // set btn as input_pullup - pin 27
+ pinMode(28, INPUT_PULLUP); // set btn as input_pullup - pin 28
+ pinMode(29, INPUT_PULLUP); // set btn as input_pullup - pin 29
+ pinMode(30, INPUT_PULLUP); // set btn as input_pullup - pin 30
+ pinMode(31, INPUT_PULLUP); // set btn as input_pullup - pin 31
+ pinMode(32, INPUT); // set ir sensor as input - pin 32
 
  lcd.init(); // Initialize the LCD
  lcd.backlight(); // Turn on the LCD backlight
@@ -163,7 +157,7 @@ void loop() {
   
   //Check if Supply 1 (main supply) is up //if main supply is dead then send notification and do alarm
   int isSupply1 = analogRead(A1);
-  if(isSupply1 == 0){
+  if(isSupply1 == 1){
     SendMessage("The main power ac adaptor was cut off! Now using the Secondary Supply!");
     tone(buzzer,1000);
     delay(5000);
@@ -171,19 +165,19 @@ void loop() {
   }
   
 
-  PushbtnItem1Value=digitalRead(PushBtnItem1);
-  PushbtnItem2Value= digitalRead(PushBtnItem2);
-  PushbtnItem3Value= digitalRead(PushBtnItem3);
-  PushbtnItem4Value = digitalRead(PushBtnItem4);
-  PushbtnItem5Value =digitalRead(PushBtnItem5); 
-  IRsensorVal =digitalRead(IRsensor); 
+  PushbtnItem1Value=digitalRead(27);
+  PushbtnItem2Value= digitalRead(28);
+  PushbtnItem3Value= digitalRead(29);
+  PushbtnItem4Value = digitalRead(30);
+  PushbtnItem5Value =digitalRead(31); 
+  IRsensorVal =digitalRead(32); 
   Serial.println(IRsensorVal);
   Serial.println(PushBtnItem1);
   Serial.println(PushBtnItem2);
   Serial.println(PushBtnItem3);
   Serial.println(PushBtnItem4);
   Serial.println(PushBtnItem5);
-  if(IRsensorVal == 1){
+  if(IRsensorVal == 0){
     tone(buzzer,1000);
     String Message="Someone has forced open the vending machine";
     SendMessage(Message);
@@ -409,12 +403,8 @@ void GetSMSText(){
       Serial.println(SmsString);
       if(SmsString.indexOf("+CMT:") > 0){
         if(SmsString.indexOf("How many")>=0){
-          String msgItem1 = "Quantity of Item 1="+String(inventoryItem1)+"\n";
-          String msgItem2 = "Quantity of Item 2="+String(inventoryItem2)+"\n";
-          String msgItem3 = "Quantity of Item 3="+String(inventoryItem3)+"\n";
-          String msgItem4 = "Quantity of Item 4="+String(inventoryItem4)+"\n";
-          String msgItem5 = "Quantity of Item 5="+String(inventoryItem5);
-          String quantityMsg = msgItem1+msgItem2+msgItem3+msgItem4+msgItem5;
+          int TotalInventoryItem = inventoryItem1 + inventoryItem2 + inventoryItem3 +inventoryItem4+inventoryItem5;
+          String quantityMsg = "Total Quantity of Items = "+ String(TotalInventoryItem);
           SendMessage(quantityMsg);
         }
         if(SmsString.indexOf("Total amount")>=0){
@@ -427,16 +417,6 @@ void GetSMSText(){
           inventoryItem3=5;
           inventoryItem4=5;
           inventoryItem5=5;
-          isZeroItem1=false;
-          isZeroItem2=false;
-          isZeroItem3=false;
-          isZeroItem4=false;
-          isZeroItem5=false;
-          invItemHasbeenChecked1= false;  
-          invItemHasbeenChecked2= false;  
-          invItemHasbeenChecked3= false;  
-          invItemHasbeenChecked4= false;  
-          invItemHasbeenChecked5= false;  
           String MessageFullyRestock = "Vending Machine Inventory has been fully restocked";
           SendMessage(MessageFullyRestock);
         }
@@ -526,6 +506,7 @@ void CheckIfSufficientBalance(String item, int servoNumber, int quantity){
     lcd.setCursor(0,1);
     lcd.print("item");
     InsertedAmount=0;
+    TotalItemCost = 0;
     RemainingCost=0;
     lcd.clear();
     transactionFinished=true;
@@ -584,82 +565,45 @@ void ReadInsertedCoin(){
 
 void CheckInventoryQuantity(){
 
-  if(inventoryItem1==2 && !invItemHasbeenChecked1){
-    String Message = "Item 1 iventory to low. Please restock. Current remaining items in Item 1: " + String(inventoryItem1);
-    SendMessage(Message);   
-    invItemHasbeenChecked1= true; 
-  }
-  if(inventoryItem2==2 && !invItemHasbeenChecked2){
-    String Message = "Item 2 iventory to low. Please restock. Current remaining items in Item 2: " + String(inventoryItem2);
-    SendMessage(Message);   
-    invItemHasbeenChecked2= true;  
-  }
-
-  if(inventoryItem3==2 && !invItemHasbeenChecked3){
-    String Message = "Item 3 iventory to low. Please restock. Current remaining items in Item 3: " + String(inventoryItem3);
-    SendMessage(Message);   
-    invItemHasbeenChecked3= true;  
-  }
-
-  if(inventoryItem4==2 && !invItemHasbeenChecked4){
-    String Message = "Item 4 iventory to low. Please restock. Current remaining items in Item 4: " + String(inventoryItem4);
+  int TotalInventoryItemQuantity = inventoryItem1 + inventoryItem2 + inventoryItem3 + inventoryItem4 + inventoryItem5;
+  if (TotalInventoryItemQuantity == 3 && !InventoryQuantity3){
+    String Message = "Inventory to low. Please restock. Current remaining items in Vending machine are : " + String(TotalInventoryItemQuantity);
     SendMessage(Message);  
-    invItemHasbeenChecked4= true;   
+    InventoryQuantity3 = true;
   }
 
-  if(inventoryItem5==2 && !invItemHasbeenChecked5){
-    String Message = "Item 5 iventory to low. Please restock. Current remaining items in Item 5: " + String(inventoryItem5);
-    SendMessage(Message);   
-    invItemHasbeenChecked5= true;  
-  }
-
-  if(inventoryItem1<=0 && !isZeroItem1){
-    String Message = "Item 1 iventory to low. Please restock. Current remaining items in Item 1: " + String(inventoryItem1);
-    SendMessage(Message);   
-    invItemHasbeenChecked1= true; 
-    isZeroItem1= true;
-  }
-  if(inventoryItem2<=0 && !isZeroItem2){
-    String Message = "Item 2 iventory to low. Please restock. Current remaining items in Item 2: " + String(inventoryItem2);
-    SendMessage(Message);   
-    invItemHasbeenChecked2= true;  
-    isZeroItem2= true;
-  }
-
-  if(inventoryItem3<=0 && !isZeroItem3){
-    String Message = "Item 3 iventory to low. Please restock. Current remaining items in Item 3: " + String(inventoryItem3);
-    SendMessage(Message);   
-    invItemHasbeenChecked3= true;  
-    isZeroItem3= true;
-  }
-
-  if(inventoryItem4<=0 && !isZeroItem4){
-    String Message = "Item 4 iventory to low. Please restock. Current remaining items in Item 4: " + String(inventoryItem4);
+ if (TotalInventoryItemQuantity == 2 && !InventoryQuantity2){
+    String Message = "Inventory to low. Please restock. Current remaining items in Vending machine are : " + String(TotalInventoryItemQuantity);
     SendMessage(Message);  
-    invItemHasbeenChecked4= true;   
-    isZeroItem4= true;
+    InventoryQuantity2 = true;
   }
 
-  if(inventoryItem5<=0 && !isZeroItem5){
-    String Message = "Item 5 iventory to low. Please restock. Current remaining items in Item 5: " + String(inventoryItem5);
-    SendMessage(Message);   
-    invItemHasbeenChecked5= true;  
-    isZeroItem5= true;
-  }
+ if (TotalInventoryItemQuantity == 1 && !InventoryQuantity1){
+    String Message = "Inventory to low. Please restock. Current remaining items in Vending machine are : " + String(TotalInventoryItemQuantity);
+    SendMessage(Message);  
+    InventoryQuantity1 = true;
+ }
+
+  if (TotalInventoryItemQuantity == 0 && !InventoryQuantity0){
+    String Message = "Vending Machine is empty please Restock.";
+    SendMessage(Message);  
+    InventoryQuantity0 = true;
+ }
+
 
   
 }
 
 void DelayFunc(int numberofItems){
   if(numberofItems==1){
-    delay(1500);
+    delay(1000);
   }else if (numberofItems==2){
-    delay(3000);
+    delay(2000);
   }else if (numberofItems==3){
-    delay(4500);
+    delay(300);
   }else if (numberofItems==4){
-    delay(6000);
+    delay(4000);
   }else if (numberofItems==5){
-    delay(7500);
+    delay(5000);
   }
 }
